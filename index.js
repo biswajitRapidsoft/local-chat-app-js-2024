@@ -64,35 +64,72 @@ function showalluser(params) {
   let alluser = document.getElementById("alluser");
   alluser.innerHTML = "";
 
+  // var input = document.createElement("input");
+  // input.setAttribute("type", "text");
+  // input.setAttribute("name", "myTextInput");
+  // input.setAttribute("placeholder", "Enter text here...");
+  // input.setAttribute("id", "search-bar");
 
-
-
-  var form = document.createElement('form');
-  form.setAttribute('id', 'myForm');
-  
-  var input = document.createElement('input');
-  input.setAttribute('type', 'text');
-  input.setAttribute('name', 'myTextInput');
-  input.setAttribute('placeholder', 'Enter text here...');
-  input.setAttribute('id',"search-bar");
-  
-
-  form.appendChild(input);
-  alluser.appendChild(form);
-  
-  const searchBar = document.getElementById('search-bar');
-  searchBar.addEventListener('input', function() {
-    const searchTerm = this.value.trim().toLowerCase();
-
-    
-    console.log("Search Term:", searchTerm);
+  const searchBar = document.getElementById("search-bar");
+  searchBar.addEventListener("input", function (e) {
+    const searchTerm = e.target.value.trim();
+    filterUsers(searchTerm);
+    // console.log("Search Term:", searchTerm);
   });
 
+  function filterUsers(searchTerm) {
+    const storedLoginData = JSON.parse(localStorage.getItem("login")) || [];
+    const currentUser = sessionStorage.getItem("currentUser");
+    const alluser = document.getElementById("alluser");
+
+    alluser.innerHTML = "";
+
+    storedLoginData.forEach((user) => {
+      if (
+        user.username !== currentUser &&
+        user.username.toLowerCase().includes(searchTerm)
+      ) {
+        let newuser = createUserElement(user);
+        alluser.appendChild(newuser);
+      }
+    });
+  }
+
+  function createUserElement(user) {
+    let newuser = document.createElement("div");
+    newuser.addEventListener("click", showchat);
+    newuser.id = user.username;
+    newuser.value = user.username;
+
+    let userImg = document.createElement("img");
+    userImg.src = "./icon-5359553_640.webp";
+    userImg.alt = "User Image";
+    userImg.value = user.username;
+
+    newuser.appendChild(userImg);
+
+    const newContent = document.createTextNode(user.username);
+    newuser.appendChild(newContent);
+
+    let truestate = document.createElement("img");
+    if (user.status) {
+      truestate.src = "./download.png";
+      truestate.className = "y";
+    } else {
+      truestate.src = "./download.jpg";
+      truestate.className = "y";
+    }
+    newuser.appendChild(truestate);
+
+    return newuser;
+  }
 
   storedLoginData.forEach((user) => {
     if (user.username !== currentUser) {
       let newuser = document.createElement("div");
       newuser.addEventListener("click", showchat);
+      // newuser.setAttribute("class", "prihighlight")  ;
+
       newuser.id = user.username;
       newuser.value = user.username;
 
@@ -122,9 +159,15 @@ function showalluser(params) {
 }
 let x;
 function showchat(e) {
+  let highlight=document.getElementsByClassName("highlight");
+  for (let i = 0; i < highlight.length; i++) {
+    highlight[i].classList.remove("highlight");
+  }
+
   clearInterval(x);
   document.getElementById("formid").style.display = "flex";
   let sendingto = e.target.value;
+  e.target.setAttribute("class", "highlight") ;
 
   let chatbox = document.getElementById("chatbox");
   chatbox.value = sendingto;
@@ -169,9 +212,20 @@ function signup(e) {
     status: false,
   };
   let existingLoginData = JSON.parse(localStorage.getItem("login")) || [];
-  existingLoginData.push(loginData);
-  localStorage.setItem("login", JSON.stringify(existingLoginData));
-  showLogin();
+
+  let check = existingLoginData.find((user) =>user.username === username
+  );
+  console.log(check);
+  if (check) {
+    alert("username allready exist");
+  } else {
+    existingLoginData.push(loginData);
+    localStorage.setItem("login", JSON.stringify(existingLoginData));
+    showLogin();
+  }
+
+  document.getElementById("signupUsername").value="";
+ document.getElementById("signupPassword").value="";
 }
 
 function sendMessage(event) {
@@ -282,6 +336,8 @@ function login(e) {
   } else {
     alert("Incorrect username or password or allready logedin");
   }
+  usernameInput.value="";
+  passwordInput.value=""
 }
 
 function handleSuccessfulLogin(user) {
