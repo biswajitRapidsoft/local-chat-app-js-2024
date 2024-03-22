@@ -33,26 +33,30 @@ window.addEventListener("storage", function (e) {
 });
 
 function showalluser(params) {
+  let left=document.createElement("div");
   let userImg = document.createElement("img");
   userImg.src = "./icon-5359553_640.webp";
   userImg.alt = "User Image";
   let curr = document.getElementById("currentuser");
   curr.innerHTML = "";
-  curr.appendChild(userImg);
+  
+  left.appendChild(userImg);
 
-  curr.appendChild(document.createTextNode(" "));
+  left.appendChild(document.createTextNode(" "));
   let currentuser = sessionStorage.getItem("currentUser");
   const newContent = document.createTextNode(currentuser);
-  curr.appendChild(newContent);
-  let activestat = document.createElement("div");
+  left.appendChild(newContent);
+  // let activestat = document.createElement("div");
 
   if (currentuser) {
     let truestate = document.createElement("img");
     truestate.src = "./download.png";
     truestate.className = "x";
-    activestat.appendChild(truestate);
+    // activestat.appendChild(truestate);
+    left.appendChild(truestate);
+
   }
-  curr.appendChild(activestat);
+  curr.appendChild(left)
 
   let logoutdiv = document.createElement("button");
   logoutdiv.addEventListener("click", logout);
@@ -156,6 +160,24 @@ function showalluser(params) {
       alluser.appendChild(newuser);
     }
   });
+
+
+  let chatmessages=document.getElementById("chatMessages");
+  chatmessages.innerHTML="";
+  let initialdisplay=document.createElement("div");
+  initialdisplay.setAttribute("class","initialdisplay");
+  let heading=document.createElement("h1");
+  let heading2=document.createElement("h1");
+
+
+  heading.innerText="Welcome!!";
+  heading2.innerText=currentUser;
+
+  initialdisplay.appendChild(heading);
+  initialdisplay.appendChild(heading2);
+
+  chatmessages.appendChild(initialdisplay);
+
 }
 let x;
 function showchat(e) {
@@ -328,7 +350,7 @@ function login(e) {
   const storedLoginData = JSON.parse(localStorage.getItem("login")) || [];
 
   const matchedUser = storedLoginData.find(
-    (user) => user.username === username && user.password === password
+    (user) => user.username === username && user.password === password &&user.status===false
   );
 
   if (matchedUser) {
