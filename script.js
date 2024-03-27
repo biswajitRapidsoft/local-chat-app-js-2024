@@ -35,7 +35,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const messages = JSON.parse(localStorage.getItem("messages")) || [];
 
   const createChatMsgElement = (msg) => {
+    loggedInUser = sessionStorage.getItem("loggedInUser");
+    debugger
     const isSentByLoggedInUser = msg.sender === loggedInUser;
+    console.log(msg.sender)
+    console.log(loggedInUser)
+
 
     const alignClass = isSentByLoggedInUser ? "ms-auto" : "me-auto";
     const bgColorClass = isSentByLoggedInUser ? "blue-bg" : "grey-bg";
@@ -51,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const updatemsgSender = () => {
     let loggedInUser = sessionStorage.getItem("loggedInUser");
-    chatHeader.innerHTML = `Chatting With ${receiver}...`;
+    chatHeader.innerHTML = `${receiver}`;
     chatInput.placeholder = `Type here, ${loggedInUser}...`;
 
     chatInput.focus();
@@ -68,6 +73,8 @@ document.addEventListener("DOMContentLoaded", function () {
       hour12: true,
     });
 
+    
+
     const msg = {
       sender: loggedInUser,
       receiver: receiver,
@@ -75,21 +82,22 @@ document.addEventListener("DOMContentLoaded", function () {
       timestamp: timestamp,
       tabId: tabId,
     };
+    debugger
 
     let existingMessages = JSON.parse(localStorage.getItem("messages")) || [];
 
     existingMessages.push(msg);
 
     localStorage.setItem("messages", JSON.stringify(existingMessages));
+    debugger
 
     chatMsgs.insertAdjacentHTML("beforeend", createChatMsgElement(msg));
-
+    
     chatInputForm.reset();
     chatMsgs.scrollTop = chatMsgs.scrollHeight;
   };
 
   chatInputForm.addEventListener("submit", sendMsg);
-
 
   clrChatBtn.addEventListener("click", () => {
     const loggedInUser = sessionStorage.getItem("loggedInUser");
@@ -209,24 +217,54 @@ document.addEventListener("DOMContentLoaded", function () {
 
   logoutBtn.addEventListener("click", logoutUser);
 
+  // function loadChatHistory(user1, user2) {
+  //   const filteredMessages = JSON.parse(
+  //     localStorage.getItem("messages")
+  //   ).filter(
+  //     (msg) =>
+  //       (msg.sender === user1 && msg.receiver === user2) ||
+  //       (msg.sender === user2 && msg.receiver === user1)
+  //   );
+
+  //   chatMsgs.innerHTML = "";
+
+  //   filteredMessages.forEach((msg) => {
+  //     const newmsg = createChatMsgElement(msg);
+  //     chatMsgs.insertAdjacentHTML("beforeend", newmsg);
+  //   });
+
+  //   chatMsgs.scrollTop = chatMsgs.scrollHeight;
+  // }
+
   function loadChatHistory(user1, user2) {
-    const filteredMessages = JSON.parse(
-      localStorage.getItem("messages")
-    ).filter(
+    const filteredMessages = JSON.parse(localStorage.getItem("messages")).filter(
       (msg) =>
         (msg.sender === user1 && msg.receiver === user2) ||
         (msg.sender === user2 && msg.receiver === user1)
     );
-
+  
     chatMsgs.innerHTML = "";
-
+  
+    const loggedInUser = sessionStorage.getItem("loggedInUser");
+  
     filteredMessages.forEach((msg) => {
-      const newmsg = createChatMsgElement(msg);
+      const isSentByLoggedInUser = msg.sender === loggedInUser;
+      const alignClass = isSentByLoggedInUser ? "ms-auto" : "me-auto";
+      const bgColorClass = isSentByLoggedInUser ? "blue-bg" : "grey-bg";
+  
+      const newmsg = `
+        <div class="msg ${bgColorClass} ${alignClass}">
+          <div class="msg-sender">${msg.sender}</div>
+          <div class="msg-text">${msg.text}</div>
+          <div class="msg-timestamp">${msg.timestamp}</div>
+        </div>
+      `;
       chatMsgs.insertAdjacentHTML("beforeend", newmsg);
     });
-
+  
     chatMsgs.scrollTop = chatMsgs.scrollHeight;
   }
+  
 
   function displayUserList() {
     const users = JSON.parse(localStorage.getItem("users")) || [];
@@ -258,7 +296,8 @@ document.addEventListener("DOMContentLoaded", function () {
         personSelector.appendChild(userButton);
 
         userButton.addEventListener("click", (e) => {
-          receiver = e.target.textContent;
+          // receiver = e.target.textContent;
+          receiver = user.username;
 
           clrChatBtn.classList.remove("d-none");
 
@@ -272,6 +311,7 @@ document.addEventListener("DOMContentLoaded", function () {
           userButton.classList.add("grey-bg");
 
           updatemsgSender(receiver);
+          const loggedInUser = sessionStorage.getItem("loggedInUser");
           loadChatHistory(loggedInUser, receiver);
         });
 
