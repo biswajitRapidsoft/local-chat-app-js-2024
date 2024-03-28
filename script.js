@@ -36,12 +36,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const createChatMsgElement = (msg) => {
     loggedInUser = sessionStorage.getItem("loggedInUser");
-    debugger
     const isSentByLoggedInUser = msg.sender === loggedInUser;
-    console.log(msg.sender)
-    console.log(loggedInUser)
-
-
+    
     const alignClass = isSentByLoggedInUser ? "ms-auto" : "me-auto";
     const bgColorClass = isSentByLoggedInUser ? "blue-bg" : "grey-bg";
 
@@ -82,14 +78,12 @@ document.addEventListener("DOMContentLoaded", function () {
       timestamp: timestamp,
       tabId: tabId,
     };
-    debugger
 
     let existingMessages = JSON.parse(localStorage.getItem("messages")) || [];
 
     existingMessages.push(msg);
 
     localStorage.setItem("messages", JSON.stringify(existingMessages));
-    debugger
 
     chatMsgs.insertAdjacentHTML("beforeend", createChatMsgElement(msg));
     
